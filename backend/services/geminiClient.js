@@ -172,17 +172,14 @@ function createChangesSummary(parsedDiff) {
 
 /**
  * Parse the Gemini API response to extract commit message suggestions
- * @param {Object} response The Gemini API response
+ * @param {string} responseText The text response from Gemini API
  * @returns {Array<{ message: string, explanation: string }>} Commit message suggestions
  */
-function parseGeminiResponse(response) {
+function parseGeminiResponse(responseText) {
     try {
-        // Extract the text from the response
-        const text = response.candidates[0].content.parts[0].text;
-
         // Try to parse the JSON response
         // Find JSON array in the response (it might be surrounded by other text)
-        const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
 
         if (jsonMatch) {
             const suggestions = JSON.parse(jsonMatch[0]);
@@ -198,7 +195,7 @@ function parseGeminiResponse(response) {
         }
 
         // If JSON parsing fails, try to extract suggestions manually
-        const fallbackSuggestions = extractFallbackSuggestions(text);
+        const fallbackSuggestions = extractFallbackSuggestions(responseText);
         if (fallbackSuggestions.length > 0) {
             return fallbackSuggestions;
         }
