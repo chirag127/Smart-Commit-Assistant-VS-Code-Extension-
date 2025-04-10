@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "publisher": "Chiragsinghal",
   "engines": {
+    
     "vscode": "^1.99.0"
   },
   "categories": [

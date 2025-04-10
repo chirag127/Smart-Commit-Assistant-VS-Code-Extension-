@@ -33,7 +33,6 @@ async function generateCommitMessages(parsedDiff, tone, apiKey) {
             topP: 0.95,
             topK: 40,
             maxOutputTokens: 1024,
-            responseMimeType: "text/plain",
         };
 
         // Start a chat session
@@ -50,7 +49,17 @@ async function generateCommitMessages(parsedDiff, tone, apiKey) {
         return parseGeminiResponse(responseText);
     } catch (error) {
         console.error("Error generating commit messages:", error);
-        throw error;
+
+        // Provide more detailed error information
+        if (error.message && error.message.includes("400 Bad Request")) {
+            throw new Error(
+                `API Error: ${error.message}. Please check your API key and model configuration.`
+            );
+        } else if (error.message && error.message.includes("429")) {
+            throw new Error("Rate limit exceeded. Please try again later.");
+        } else {
+            throw error;
+        }
     }
 }
 

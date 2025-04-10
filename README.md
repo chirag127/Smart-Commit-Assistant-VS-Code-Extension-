@@ -11,7 +11,7 @@ This repository contains both the VS Code extension and the backend server:
 
 ## Features
 
--   **AI-Powered Commit Messages**: Automatically generate high-quality commit messages based on your staged changes using Gemini 2.0 Flash Lite.
+-   **AI-Powered Commit Messages**: Automatically generate high-quality commit messages based on your staged changes using Google's Gemini AI.
 -   **Multiple Suggestions**: Get 1-3 different commit message options to choose from.
 -   **Contextual Explanations**: Each suggestion includes a natural language explanation of what changed and why.
 -   **Customizable Tone**: Choose from different tone presets: conventional, casual, detailed, or emoji-style.
@@ -65,7 +65,8 @@ This repository contains both the VS Code extension and the backend server:
 
     ```bash
     cp .env.example .env
-    # Edit .env to add your Gemini API key
+    # Edit .env to add your Gemini API key from Google AI Studio
+    # Get your API key at: https://makersuite.google.com/app/apikey
     ```
 
 4. Start the server:
