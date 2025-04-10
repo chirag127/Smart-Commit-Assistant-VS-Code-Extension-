@@ -1,23 +1,122 @@
 {
   "name": "smart-commit-assistant",
   "displayName": "Smart Commit Assistant",
-  "description": "It is a VS Code extension that auto-generates clear, concise, and context-aware Git commit messages using AI. It analyzes staged diffs and provides multiple commit message suggestions and natural language explanations to enhance developer productivity and maintain high-quality version history.",
+  "description": "Auto-generates clear, concise, and context-aware Git commit messages using AI. It analyzes staged diffs and provides multiple commit message suggestions and natural language explanations to enhance developer productivity and maintain high-quality version history.",
   "version": "0.0.1",
+  "publisher": "chirag127",
   "engines": {
     "vscode": "^1.99.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "commit",
+    "ai",
+    "message",
+    "gemini"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "smart-commit-assistant.helloWorld",
-        "title": "Hello World"
+        "command": "smart-commit-assistant.generateCommitMessage",
+        "title": "Smart Commit: Generate Commit Message",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "smart-commit-assistant.regenerateCommitMessage",
+        "title": "Smart Commit: Regenerate Commit Message",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "smart-commit-assistant.insertCommitMessage",
+        "title": "Smart Commit: Insert Commit Message",
+        "icon": "$(check)"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "smart-commit-assistant",
+          "title": "Smart Commit Assistant",
+          "icon": "$(git-commit)"
+        }
+      ]
+    },
+    "views": {
+      "smart-commit-assistant": [
+        {
+          "id": "smart-commit-assistant.commitView",
+          "name": "Commit Messages",
+          "type": "webview"
+        }
+      ]
+    },
+    "menus": {
+      "scm/title": [
+        {
+          "command": "smart-commit-assistant.generateCommitMessage",
+          "group": "navigation",
+          "when": "scmProvider == git"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "smart-commit-assistant.generateCommitMessage",
+          "when": "view == smart-commit-assistant.commitView",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "smart-commit-assistant.generateCommitMessage",
+          "when": "scmProvider == git"
+        },
+        {
+          "command": "smart-commit-assistant.regenerateCommitMessage",
+          "when": "false"
+        },
+        {
+          "command": "smart-commit-assistant.insertCommitMessage",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Smart Commit Assistant",
+      "properties": {
+        "smartCommitAssistant.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for Gemini 2.0 Flash Lite"
+        },
+        "smartCommitAssistant.apiEndpoint": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "API Endpoint for the Smart Commit Assistant backend"
+        },
+        "smartCommitAssistant.defaultTone": {
+          "type": "string",
+          "enum": [
+            "conventional",
+            "casual",
+            "detailed",
+            "emoji-style"
+          ],
+          "default": "conventional",
+          "description": "Default tone for commit messages"
+        },
+        "smartCommitAssistant.autoStageCommit": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically stage and commit changes after selecting a commit message"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -26,6 +125,10 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/vscode": "^1.99.0",

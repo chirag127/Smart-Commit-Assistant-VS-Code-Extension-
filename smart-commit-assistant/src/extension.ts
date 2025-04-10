@@ -1,26 +1,117 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { GitService } from "./gitService";
+import { ApiService, ToneType } from "./apiService";
+import { CommitMessageViewProvider } from "./webviewProvider";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    console.log("Smart Commit Assistant is now active!");
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "smart-commit-assistant" is now active!');
+    // Initialize services
+    const gitService = new GitService();
+    const apiService = new ApiService();
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('smart-commit-assistant.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Smart Commit Assistant!');
-	});
+    // Register the webview provider
+    const commitMessageViewProvider = new CommitMessageViewProvider(
+        context.extensionUri,
+        apiService,
+        gitService
+    );
 
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            CommitMessageViewProvider.viewType,
+            commitMessageViewProvider
+        )
+    );
+
+    // Register the generate commit message command
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "smart-commit-assistant.generateCommitMessage",
+            async () => {
+                try {
+                    // Check if Git is available
+                    const isGitAvailable = await gitService.isGitAvailable();
+                    if (!isGitAvailable) {
+                        vscode.window.showErrorMessage(
+                            "Git is not available in the current workspace"
+                        );
+                        return;
+                    }
+
+                    // Check if API is available
+                    const isApiAvailable = await apiService.isApiAvailable();
+                    if (!isApiAvailable) {
+                        const result = await vscode.window.showErrorMessage(
+                            "Smart Commit Assistant API is not available. Please make sure the backend server is running.",
+                            "Open Settings"
+                        );
+
+                        if (result === "Open Settings") {
+                            vscode.commands.executeCommand(
+                                "workbench.action.openSettings",
+                                "smartCommitAssistant.apiEndpoint"
+                            );
+                        }
+                        return;
+                    }
+
+                    // Get the default tone from settings
+                    const defaultTone =
+                        (vscode.workspace
+                            .getConfiguration("smartCommitAssistant")
+                            .get("defaultTone") as ToneType) || "conventional";
+
+                    // Show the commit message view
+                    await vscode.commands.executeCommand(
+                        "smart-commit-assistant.commitView.focus"
+                    );
+
+                    // Generate commit messages
+                    await commitMessageViewProvider.generateCommitMessages(
+                        defaultTone
+                    );
+                } catch (error) {
+                    let errorMessage = "Failed to generate commit messages";
+
+                    if (error instanceof Error) {
+                        errorMessage = error.message;
+                    }
+
+                    vscode.window.showErrorMessage(errorMessage);
+                }
+            }
+        )
+    );
+
+    // Register the regenerate commit message command
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "smart-commit-assistant.regenerateCommitMessage",
+            async () => {
+                try {
+                    // Get the default tone from settings
+                    const defaultTone =
+                        (vscode.workspace
+                            .getConfiguration("smartCommitAssistant")
+                            .get("defaultTone") as ToneType) || "conventional";
+
+                    // Generate commit messages
+                    await commitMessageViewProvider.generateCommitMessages(
+                        defaultTone
+                    );
+                } catch (error) {
+                    let errorMessage = "Failed to regenerate commit messages";
+
+                    if (error instanceof Error) {
+                        errorMessage = error.message;
+                    }
+
+                    vscode.window.showErrorMessage(errorMessage);
+                }
+            }
+        )
+    );
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
