@@ -128,3 +128,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+smart-commit-assistant/smart-commit-assistant-0.0.1.vsix

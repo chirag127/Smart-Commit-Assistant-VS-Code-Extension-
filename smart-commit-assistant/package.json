@@ -96,7 +96,7 @@
         },
         "smartCommitAssistant.apiEndpoint": {
           "type": "string",
-          "default": "http://localhost:3000",
+          "default": "https://smart-commit-assistant-vs-code-extension.onrender.com",
           "description": "API Endpoint for the Smart Commit Assistant backend"
         },
         "smartCommitAssistant.defaultTone": {
