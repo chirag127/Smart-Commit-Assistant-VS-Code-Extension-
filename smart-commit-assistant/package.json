@@ -3,7 +3,7 @@
   "displayName": "Smart Commit Assistant",
   "description": "Auto-generates clear, concise, and context-aware Git commit messages using AI. It analyzes staged diffs and provides multiple commit message suggestions and natural language explanations to enhance developer productivity and maintain high-quality version history.",
   "version": "0.0.1",
-  "publisher": "chirag127",
+  "publisher": "Chiragsinghal",
   "engines": {
     "vscode": "^1.99.0"
   },
